@@ -9,20 +9,24 @@ This project sets up Traefik as a reverse proxy using Docker Compose.
 
 ## Getting Started
 
-1. **Create the network**
+1. **Create env**
+```bash
+touch .env && echo "EMAIL=your-email@example.com" >> .env
+```
+Change **your-email@example.com** to your email.
+
+2. **Create the network**
 ```bash
 make network
 ```
 
-1. **Start the services:**
+3. **Start the services:**
 ```bash
 make up
 ```
 
-2. **Access the Traefik Dashboard:**
+4. **Access the Traefik Dashboard:**
 Open [http://localhost:8080](http://localhost:8080) in your browser.
-
-
 
 ## Configuration
 
@@ -58,6 +62,7 @@ services:
       - "traefik.http.routers.my-app.entrypoints=web"
     networks:
       - traefik-net
+      - default #sometimes needed
 
 networks:
   traefik-net:
