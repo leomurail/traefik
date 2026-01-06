@@ -1,5 +1,10 @@
 # Let's Encrypt
 letsencrypt/
 
-# Env
+# Environment files
 .env
+.env.local
+.env.*.local
+
+# Allow committing an example file if created later
+!.env.example

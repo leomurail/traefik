@@ -1,76 +1,71 @@
-# Traefik Docker Project
+# Traefik Docker Proxy
 
-This project sets up Traefik as a reverse proxy using Docker Compose.
+Setup Traefik ultra-pro pour gérer tes containers en local et en production avec du HTTPS automatique.
 
-## Prerequisites
+## 🚀 Installation Rapide
 
-- Docker
-- Docker Compose
+1. **Préparer le réseau Docker**
+   ```bash
+   make network
+   ```
 
-## Getting Started
+2. **Configurer l'email (pour Let's Encrypt en prod)**
+   ```bash
+   echo "EMAIL=votre-email@exemple.com" > .env
+   ```
 
-1. **Create env**
+## 🛠️ Utilisation
+
+### Mode Local (Développement)
+Lance Traefik sans SSL, avec le dashboard accessible sur le port 8080.
 ```bash
-touch .env && echo "EMAIL=your-email@example.com" >> .env
+make local
 ```
-Change **your-email@example.com** to your email.
+- **Dashboard** : [http://localhost:8080](http://localhost:8080)
+- **Points d'entrée** : Port 80 (HTTP)
 
-2. **Create the network**
+### Mode Production
+Lance Traefik avec gestion automatique des certificats SSL (Let's Encrypt) et redirection HTTP -> HTTPS.
 ```bash
-make network
+make prod
 ```
+- **Points d'entrée** : Port 80 (Redir) & Port 443 (HTTPS)
+- **Dashboard** : Accessible sur le port 8080 (Pensez à votre Firewall !)
 
-3. **Start the services:**
-```bash
-make up
-```
-
-4. **Access the Traefik Dashboard:**
-Open [http://localhost:8080](http://localhost:8080) in your browser.
-
-## Configuration
-
-The configuration is defined in `compose.yaml`.
-
-- **Traefik**: Listens on port 80 (web) and 8080 (dashboard).
-- **Docker Provider**: Automatically discovers containers with `traefik.enable=true` labels.
-
-## Stopping
-
-To stop the services and remove the containers:
-
+### Arrêter les services
 ```bash
 make down
 ```
 
-## Adding a New Project
+## 📁 Structure du Projet
 
-To add a new project (e.g., a web app) and expose it via Traefik:
+- `docker-compose.yaml` : La base commune (Image, Docker Socket, Réseaux).
+- `docker-compose.local.yaml` : Override pour le dev (Dashboard insecure, HTTP).
+- `docker-compose.prod.yaml` : Override pour la prod (SSL Let's Encrypt, Redirection HTTPS).
+- `makefile` : Tes raccourcis pour ne pas taper de commandes à rallonge.
 
-1.  **Network**: Ensure your project's service is connected to the `traefik-net` network.
-2.  **Labels**: Add the necessary Traefik labels to your service.
+## 📦 Ajouter un projet (Exemple)
 
-Example `compose.yaml` for a new project:
+Pour exposer un nouveau container via Traefik, utilise ces labels dans ton `docker-compose.yaml` :
 
 ```yaml
 services:
-  my-app:
+  mon-app:
     image: nginx:alpine
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.my-app.rule=Host(`myapp.localhost`)"
-      - "traefik.http.routers.my-app.entrypoints=web"
+      # Route HTTP
+      - "traefik.http.routers.mon-app.rule=Host(`mon-app.localhost`)"
+      - "traefik.http.routers.mon-app.entrypoints=web"
+      # Pour la PROD (SSL)
+      - "traefik.http.routers.mon-app-secure.rule=Host(`mon-app.fr`)"
+      - "traefik.http.routers.mon-app-secure.entrypoints=websecure"
+      - "traefik.http.routers.mon-app-secure.tls=true"
+      - "traefik.http.routers.mon-app-secure.tls.certresolver=myresolver"
     networks:
       - traefik-net
-      - default #sometimes needed
 
 networks:
   traefik-net:
     external: true
 ```
-
-See `demo-app/compose.yaml` for a working example.
-"
-
-This tells the container that `api.keep-up.local` resolves to the host machine's IP, allowing the request to hit Traefik on port 80.
-
