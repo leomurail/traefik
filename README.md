@@ -44,9 +44,9 @@ make down
 - `docker-compose.prod.yaml` : Override pour la prod (SSL Let's Encrypt, Redirection HTTPS).
 - `makefile` : Tes raccourcis pour ne pas taper de commandes à rallonge.
 
-## 📦 Ajouter un projet (Exemple)
+## 📦 Ajouter un projet (Exemple Universel)
 
-Pour exposer un nouveau container via Traefik, utilise ces labels dans ton `docker-compose.yaml` :
+Grâce à cette config, tu utilises **les mêmes labels** en local et en prod. Traefik s'occupe de mettre un vrai SSL en prod et un SSL auto-signé en local.
 
 ```yaml
 services:
@@ -54,14 +54,11 @@ services:
     image: nginx:alpine
     labels:
       - "traefik.enable=true"
-      # Route HTTP
-      - "traefik.http.routers.mon-app.rule=Host(`mon-app.localhost`)"
-      - "traefik.http.routers.mon-app.entrypoints=web"
-      # Pour la PROD (SSL)
-      - "traefik.http.routers.mon-app-secure.rule=Host(`mon-app.fr`)"
-      - "traefik.http.routers.mon-app-secure.entrypoints=websecure"
-      - "traefik.http.routers.mon-app-secure.tls=true"
-      - "traefik.http.routers.mon-app-secure.tls.certresolver=myresolver"
+      # Règle de domaine (Local OR Prod)
+      - "traefik.http.routers.mon-app.rule=Host(`mon-app.localhost`) || Host(`mon-app.fr`)"
+      # On utilise directement l'entrée sécurisée
+      - "traefik.http.routers.mon-app.entrypoints=websecure"
+      - "traefik.http.routers.mon-app.tls=true"
     networks:
       - traefik-net
 
