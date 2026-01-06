@@ -1,2 +1,5 @@
+# Let's Encrypt
 letsencrypt/
+
+# Env
 .env
