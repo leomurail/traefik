@@ -1,5 +1,7 @@
 # Let's Encrypt
 letsencrypt/
+certs/
+local_ssl.yml
 
 # Environment files
 .env

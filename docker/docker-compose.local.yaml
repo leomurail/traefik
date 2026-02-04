@@ -1,10 +1,24 @@
 services:
   traefik:
     command:
+      # dashboard
+      - "--api.dashboard=true"
       - "--api.insecure=true"
+      # providers
       - "--providers.docker=true"
       - "--providers.docker.exposedbydefault=false"
+      # entrypoints
       - "--entrypoints.web.address=:80"
+      - "--entrypoints.websecure.address=:443"
+      - "--providers.file.directory=/etc/traefik/dynamic"
     ports:
-      - "80:80"
       - "8080:8080"
+    volumes:
+      - "./certs:/etc/traefik/certs:ro"
+      - "./local_ssl.yml:/etc/traefik/dynamic/ssl.yml:ro"
+
+# labels:
+#      - "traefik.enable=true"
+#      - "traefik.http.routers.${APP_DOMAIN}.rule=Host(`${APP_DOMAIN}`)"
+#      - "traefik.http.routers.${APP_DOMAIN}.entrypoints=websecure"
+#      - "traefik.http.routers.${APP_DOMAIN}.tls=true"
