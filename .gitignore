@@ -1,4 +1,4 @@
-# Let's Encrypt
+# SSL
 letsencrypt/
 certs/
 local_ssl.yml
